@@ -44,7 +44,6 @@ class Board:
         for _ in range(25):
             neighbor_coords = random.choice(self.available_neighbors)
             self._switch_tiles(neighbor_coords, self.empty_tile_coords)
-            self._set_empty_tile(neighbor_coords)
             time.sleep(0.01)
 
     def _update_image(self):
@@ -52,16 +51,34 @@ class Board:
         cv2.imshow(self.window_name, self._image_from_tiles())
         cv2.waitKey(1)
 
+    def _valid_switch(
+        self, tile_1_coords: TILE_COORDINATES, tile_2_coords: TILE_COORDINATES
+    ) -> bool:
+        tile_1_valid: bool = (
+            (tile_1_coords == self.empty_tile_coords)
+            | (tile_1_coords in self.available_neighbors)
+        )
+        tile_2_valid: bool = (
+            (tile_2_coords == self.empty_tile_coords)
+            | (tile_2_coords in self.available_neighbors)
+        )
+        return tile_1_valid & tile_2_valid
+
     def _switch_tiles(
         self, tile_1_coords: TILE_COORDINATES, tile_2_coords: TILE_COORDINATES
     ) -> None:
         """Switch tiles."""
-        tile_1 = self.tiles[tile_1_coords[0]][tile_1_coords[1]]
-        tile_2 = self.tiles[tile_2_coords[0]][tile_2_coords[1]]
-        self.tiles[tile_1_coords[0]][tile_1_coords[1]] = tile_2
-        self.tiles[tile_2_coords[0]][tile_2_coords[1]] = tile_1
+        if self._valid_switch(tile_1_coords, tile_2_coords) is True:
+            tile_1 = self.tiles[tile_1_coords[0]][tile_1_coords[1]]
+            tile_2 = self.tiles[tile_2_coords[0]][tile_2_coords[1]]
+            self.tiles[tile_1_coords[0]][tile_1_coords[1]] = tile_2
+            self.tiles[tile_2_coords[0]][tile_2_coords[1]] = tile_1
+            self._update_image()
+            if tile_1_coords == self.empty_tile_coords:
+                self._set_empty_tile(tile_2_coords)
+            else:
+                self._set_empty_tile(tile_1_coords)
 
-        self._update_image()
 
     def _is_solved(self) -> bool:
         """Check to see if board is solved."""
