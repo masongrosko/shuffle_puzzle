@@ -34,7 +34,11 @@ class Board:
         """Create a window and wait for click."""
         self._update_image()
         cv2.setMouseCallback(self.window_name, self._on_click)
-        cv2.waitKey(0)
+        while True:
+            value = self._get_key_press_value()
+            if self._check_esc_key(value) is True:
+                break
+            self._check_wasd_keys(value)
         cv2.destroyAllWindows()
 
     def shuffle(self) -> None:
@@ -207,6 +211,41 @@ class Board:
         print(x, x_max, y, y_max, row, col)
 
         return row, col
+
+    def _get_key_press_value(self) -> int:
+        """Returns decoded key press."""
+        out = cv2.waitKey(100) & 0xff
+        if out != 255:
+            print(out)
+        return out
+
+    def _check_esc_key(self, value: int) -> bool:
+        """Checks to see if the escape key is pressed."""
+        return value == 27
+
+    def _check_wasd_keys(self, value: int) -> None:
+        """Checks wasd keys to see if pressed."""
+        wasd_map = {
+            ord("w"): (1, 0),
+            ord("a"): (0, 1),
+            ord("s"): (-1, 0),
+            ord("d"): (0, -1)
+        }
+        tile_delta = wasd_map.get(value)
+        if tile_delta is not None:
+            print(tile_delta)
+            self._switch_tiles(
+                self.empty_tile_coords,
+                self._add_tuples(
+                    self.empty_tile_coords,
+                    tile_delta
+                )
+            )
+
+    @staticmethod
+    def _add_tuples(tuple_1: tuple, tuple_2: tuple) -> tuple:
+        """Add values of two tuples together."""
+        return tuple(map(sum, zip(tuple_1, tuple_2)))
 
     @staticmethod
     def _get_subsect_bounds(
