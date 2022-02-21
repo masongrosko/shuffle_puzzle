@@ -1,10 +1,10 @@
 """The game board."""
 
-import cv2
 import random
-import numpy as np
-
 import time
+
+import cv2
+import numpy as np
 
 import tile
 
@@ -58,13 +58,11 @@ class Board:
     def _valid_switch(
         self, tile_1_coords: TILE_COORDINATES, tile_2_coords: TILE_COORDINATES
     ) -> bool:
-        tile_1_valid: bool = (
-            (tile_1_coords == self.empty_tile_coords)
-            | (tile_1_coords in self.available_neighbors)
+        tile_1_valid: bool = (tile_1_coords == self.empty_tile_coords) | (
+            tile_1_coords in self.available_neighbors
         )
-        tile_2_valid: bool = (
-            (tile_2_coords == self.empty_tile_coords)
-            | (tile_2_coords in self.available_neighbors)
+        tile_2_valid: bool = (tile_2_coords == self.empty_tile_coords) | (
+            tile_2_coords in self.available_neighbors
         )
         return tile_1_valid & tile_2_valid
 
@@ -82,7 +80,6 @@ class Board:
                 self._set_empty_tile(tile_2_coords)
             else:
                 self._set_empty_tile(tile_1_coords)
-
 
     def _is_solved(self) -> bool:
         """Check to see if board is solved."""
@@ -213,34 +210,32 @@ class Board:
         return row, col
 
     def _get_key_press_value(self) -> int:
-        """Returns decoded key press."""
-        out = cv2.waitKey(100) & 0xff
+        """Return decoded key press."""
+        out = cv2.waitKey(100) & 0xFF
         if out != 255:
             print(out)
         return out
 
     def _check_esc_key(self, value: int) -> bool:
-        """Checks to see if the escape key is pressed."""
+        """Check to see if the escape key is pressed."""
         return value == 27
 
     def _check_wasd_keys(self, value: int) -> None:
-        """Checks wasd keys to see if pressed."""
+        """Check wasd keys to see if pressed."""
         wasd_map = {
             ord("w"): (1, 0),
             ord("a"): (0, 1),
             ord("s"): (-1, 0),
-            ord("d"): (0, -1)
+            ord("d"): (0, -1),
         }
         tile_delta = wasd_map.get(value)
         if tile_delta is not None:
             print(tile_delta)
             self._switch_tiles(
                 self.empty_tile_coords,
-                self._add_tuples(
-                    self.empty_tile_coords,
-                    tile_delta
-                )
+                self._add_tuples(self.empty_tile_coords, tile_delta),
             )
+            print(f"{self._is_solved()=}")
 
     @staticmethod
     def _add_tuples(tuple_1: tuple, tuple_2: tuple) -> tuple:
