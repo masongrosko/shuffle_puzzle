@@ -34,11 +34,7 @@ class Board:
         """Create a window and wait for click."""
         self._update_image()
         cv2.setMouseCallback(self.window_name, self._on_click)
-        while True:
-            value = self._get_key_press_value()
-            if self._check_esc_key(value) is True:
-                break
-            self._check_wasd_keys(value)
+        self._on_keystroke()
         cv2.destroyAllWindows()
 
     def shuffle(self) -> None:
@@ -122,6 +118,18 @@ class Board:
             self.shuffle()
             self._print_board_state()
             print("shuffle")
+
+    def _on_keystroke(self) -> None:
+        """When user uses keystrokes."""
+        while self._display_is_active() is True:
+            value = self._get_key_press_value()
+            if self._check_esc_key(value) is True:
+                break
+            self._check_wasd_keys(value)
+
+    def _display_is_active(self) -> bool:
+        """Check if display is active."""
+        return cv2.getWindowProperty(self.window_name, cv2.WND_PROP_VISIBLE) > 0
 
     def _reset_tiles(self) -> None:
         """Reset all the tiles."""
